@@ -108,6 +108,7 @@ require('./collection');
       + '      <br/>'
       + '      X songs'
       + '      <br/>'
+      + '       X:XX Total Length'
       + '    </p>'
       + '  </div>'
       + '</div>';
@@ -119,8 +120,10 @@ require('./collection');
  var updateCollectionView = function() {
    var $collection = $(".collection-container .row");
    $collection.empty();
- 
-   for (var i = 0; i < 33; i++) {
+
+   var randomNum = Math.floor(Math.random() * 76  + 25);
+
+   for (var i = 0; i < randomNum; i++) {
      var $newThumbnail = buildAlbumThumbnail();
      $collection.append($newThumbnail);
    }
