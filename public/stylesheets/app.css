@@ -75,6 +75,12 @@ body.landing .navbar {
   padding: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.4); }
 
+.album-container {
+  display: none; }
+
+.album-container.active {
+  display: block; }
+
 .collection-album-container {
   margin-top: 30px;
   margin-bottom: 20px; }
