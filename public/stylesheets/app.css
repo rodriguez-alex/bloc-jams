@@ -69,9 +69,9 @@
   .album-song-button .fa-play {
     padding-left: 5px; }
 
-.album-song-listing td {
+.table .album-song-listing td {
   vertical-align: center; }
-  .album-song-listing td.song-number {
+  .table .album-song-listing td.song-number {
     padding: 0;
     height: 70px;
     text-align: center; }
