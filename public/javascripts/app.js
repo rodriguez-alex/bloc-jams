@@ -138,7 +138,7 @@ var createSongRow = function(songNumber, songName, songLength) {
    var $row = $(template);
  
    var onHover = function(event) {
-    alert('hovered');
+    // alert('hovered');
     var songNumberCell = $(this).find('.song-number');
     var songNumber = songNumberCell.data('song-number');
     
@@ -148,7 +148,7 @@ var createSongRow = function(songNumber, songName, songLength) {
   };
  
    var offHover = function(event) {
-    alert('hovered off');
+    // alert('hovered off');
       var songNumberCell = $(this).find('.song-number');
       var songNumber = songNumberCell.data('song-number');
       
