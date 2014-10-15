@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-ng-app="BlocJams">
   <head>
     <title>Bloc Jams</title>
 
@@ -15,6 +15,7 @@
 
      <!-- js -->
      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
      <script src="/javascripts/vendor.js"></script>
      <script src="/javascripts/app.js"></script>
      <script>
@@ -23,7 +24,7 @@
 
   </head>
   
-  <body class='landing'>
+  <body ng-controller='Landing.controller' class='landing' ng-click="extraCoins()">
 
     <nav class="player-header-nav navbar">
        <div class="container">
@@ -37,8 +38,8 @@
  
      <div class='hero-content'> <!-- Hero content -->
       <div class='container'>
-        <h1> Bloc Jams </h1>
-        <h3> Turn the music up! </h3>
+        <h1> {{pageTitle}} </h1>
+        <h3 ng-click="subTextClicked()">{{ subText }}</h3>
       </div>
      </div>
  
@@ -60,6 +61,16 @@
         </div>
 
       </div>
-     </div>
+     </div><!-- /selling-points container -->
+
+
+     <div class="landing-album-list container">
+       <div class="row">
+         <div class="col-md-4" ng-repeat="albumURL in randomURLS">
+           <img ng-src="{{albumURL}}">
+         </div>
+       </div>
+     </div><!-- /landing-album-list container -->
+
   </body> 
 </html>
