@@ -11,6 +11,7 @@
 
      <!-- fonts -->
      <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,800,600,700,300' rel='stylesheet' type='text/css'>
+     <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
 
      <!-- js -->
@@ -30,10 +31,14 @@
     <nav class="player-header-nav navbar">
        <div class="container">
          <div class='navbar-header'> <!-- Nav Bar -->
-           <a class='logo navbar-left'>
+           <a ui-sref='landing' class='logo navbar-left'>
              <img src="/images/blocjams.png">
            </a>
-         </div>
+         </div><!-- /navbar-header -->
+
+         <ul class="nav navbar-nav navbar-right">
+            <li><a ui-sref='collection'>Library</a></li>
+          </ul>
        </div>
      </nav>
  
