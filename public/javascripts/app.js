@@ -278,7 +278,30 @@ if (document.URL.match(/\/album.html/)) {
 //require('./collection');
 //require('./profile');
 
-angular.module('BlocJams', []).controller('Landing.controller', ['$scope', function($scope) {
+
+
+ blocJams = angular.module('BlocJams', ['ui.router']);
+
+
+blocJams.config(['$stateProvider', '$locationProvider', function($stateProvider, $locationProvider) {
+   $locationProvider.html5Mode(true);
+ 
+   $stateProvider.state('landing', {
+     url: '/',
+     controller: 'Landing.controller',
+     templateUrl: '/templates/landing.html'
+   });
+
+   $stateProvider.state('song', {
+     url: '/song',
+     controller: 'Landing.controller',
+     templateUrl: '/templates/song.html'
+   });
+ }]);
+
+
+
+blocJams.controller('Landing.controller', ['$scope', function($scope) {
 
   $scope.pageTitle = "//Bloc Jams";
   $scope.subText = "Turn the music up!";
