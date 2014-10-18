@@ -48,7 +48,6 @@
 
 
 .album-container {
-  display: none;
 
   &.active {
 		display: block;
@@ -93,3 +92,8 @@
 	   text-align: center;
 	 }
  }
+
+
+tr.odd {
+  background: #5b4b65;
+}
