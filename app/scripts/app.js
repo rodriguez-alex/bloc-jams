@@ -69,43 +69,8 @@ blocJams.controller('Collection.controller', ['$scope', 'ConsoleLogger', functio
 }])
 
 
-blocJams.controller('Album.controller', ['$scope', 'SongPlayer', 'ConsoleLogger', function($scope, SongPlayer, ConsoleLogger){
-
-  ConsoleLogger.log();
-
-   $scope.album = angular.copy(albumPicasso);
-
-   var hoveredSong = null;
-
-   $scope.onHoverSong = function(song) {
-     hoveredSong = song;
-   };
-
-   $scope.offHoverSong = function(song) {
-     hoveredSong = null;
-   };
-
-   $scope.getSongState = function(song) {
-     if (song === SongPlayer.currentSong && SongPlayer.playing) {
-       return 'playing';
-     }
-     else if (song === hoveredSong) {
-       return 'hovered';
-     }
-     return 'default';
-   };
-
-    $scope.playSong = function(song) {
-      SongPlayer.setSong($scope.album, song);
-      SongPlayer.play();
-    };
-
-    $scope.pauseSong = function(song) {
-      playingSong = null;
-    };
 
 
- }]); //Album.controller
 
 
 blocJams.controller('Landing.controller', ['$scope', 'ConsoleLogger', function($scope, ConsoleLogger) {
@@ -149,6 +114,53 @@ blocJams.controller('Landing.controller', ['$scope', 'ConsoleLogger', function($
 }]); //Landing.controller
 
 
+
+
+
+
+
+
+
+blocJams.controller('Album.controller', ['$scope', 'SongPlayer', 'ConsoleLogger', function($scope, SongPlayer, ConsoleLogger){
+
+  ConsoleLogger.log();
+
+   $scope.album = angular.copy(albumPicasso);
+
+   var hoveredSong = null;
+
+   $scope.onHoverSong = function(song) {
+     hoveredSong = song;
+   };
+
+   $scope.offHoverSong = function(song) {
+     hoveredSong = null;
+   };
+
+   $scope.getSongState = function(song) {
+     if (song === SongPlayer.currentSong && SongPlayer.playing) {
+       return 'playing';
+     }
+     else if (song === hoveredSong) {
+       return 'hovered';
+     }
+     return 'default';
+   };
+
+    $scope.playSong = function(song) {
+      SongPlayer.setSong($scope.album, song);
+      SongPlayer.play();
+    };
+
+    $scope.pauseSong = function(song) {
+      playingSong = null;
+    };
+
+
+ }]); //Album.controller
+
+
+
 /////////////////////////////////
 //SONG PLAYER RELATED CONTROLLER
 
@@ -168,6 +180,12 @@ blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLog
 
 
 blocJams.service('SongPlayer', function() {
+  var trackIndex = function(album, song){
+    //console.log(album);
+    return album.songs.indexOf(song);
+  };
+
+
   return {
     currentSong: null,
     currentAlbum: null,
@@ -182,6 +200,34 @@ blocJams.service('SongPlayer', function() {
     setSong: function(album, song) {
       this.currentAlbum = album;
       this.currentSong = song;
+    },
+    next: function(){
+      var currentTrackIndex = trackIndex(this.currentAlbum, this.currentSong);
+      currentTrackIndex++;
+
+      if(currentTrackIndex >= this.currentAlbum.songs.length){
+
+        this.playing = false;
+        this.currentSong = null;
+        this.currentAlbum = null;
+
+        return;
+      }
+
+      this.currentSong = this.currentAlbum.songs[currentTrackIndex];
+    },
+    previous: function(){
+      var currentTrackIndex = trackIndex(this.currentAlbum, this.currentSong);
+      currentTrackIndex--;
+
+      if(currentTrackIndex < 0) {
+        this.playing = false;
+        this.currentSong = null;
+        this.currentAlbum = null;
+        return;
+      }
+
+      this.currentSong  = this.currentAlbum.songs[currentTrackIndex];
     }
   };
 });
