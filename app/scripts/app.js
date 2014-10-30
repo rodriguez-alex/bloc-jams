@@ -12,11 +12,11 @@
    albumArtUrl: '/images/album-placeholder.png',
 
    songs: [
-       { name: 'Blue', length: '4:26' },
-       { name: 'Green', length: '3:14' },
-       { name: 'Red', length: '5:01' },
-       { name: 'Pink', length: '3:21'},
-       { name: 'Magenta', length: '2:15'}
+       { name: 'Blue', length: '4:26', audioUrl: '/music/placeholders/blue' },
+       { name: 'Green', length: '3:14', audioUrl: '/music/placeholders/green' },
+       { name: 'Red', length: '5:01', audioUrl: '/music/placeholders/red' },
+       { name: 'Pink', length: '3:21', audioUrl: '/music/placeholders/pink' },
+       { name: 'Magenta', length: '2:15', audioUrl: '/music/placeholders/magenta' }
      ]
  };
 
@@ -55,7 +55,7 @@ blocJams.config(['$stateProvider', '$locationProvider', function($stateProvider,
  }]);
 
 
-blocJams.controller('Collection.controller', ['$scope', 'ConsoleLogger', function($scope, ConsoleLogger){
+blocJams.controller('Collection.controller', ['$scope', 'ConsoleLogger', 'SongPlayer', function($scope, ConsoleLogger, SongPlayer){
 
   ConsoleLogger.log();
 
@@ -64,6 +64,10 @@ blocJams.controller('Collection.controller', ['$scope', 'ConsoleLogger', functio
 
   for (var i = 0; i < 33; i++) {
      $scope.albums.push(angular.copy(albumPicasso));
+   }
+
+   $scope.playAlbum = function(album){
+     SongPlayer.setSong(album, album.songs[0]); // Targets first song in the array.
    }
 
 }])
@@ -149,7 +153,6 @@ blocJams.controller('Album.controller', ['$scope', 'SongPlayer', 'ConsoleLogger'
 
     $scope.playSong = function(song) {
       SongPlayer.setSong($scope.album, song);
-      SongPlayer.play();
     };
 
     $scope.pauseSong = function(song) {
@@ -180,6 +183,9 @@ blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLog
 
 
 blocJams.service('SongPlayer', function() {
+  var currentSoundFile = null;
+
+
   var trackIndex = function(album, song){
     //console.log(album);
     return album.songs.indexOf(song);
@@ -193,13 +199,27 @@ blocJams.service('SongPlayer', function() {
 
     play: function() {
       this.playing = true;
+      currentSoundFile.play();
     },
     pause: function() {
       this.playing = false;
+      currentSoundFile.pause();
     },
     setSong: function(album, song) {
+      if (currentSoundFile) {
+        currentSoundFile.stop();
+      }
+
       this.currentAlbum = album;
       this.currentSong = song;
+
+      currentSoundFile = new buzz.sound(song.audioUrl, {
+        formats: [ "mp3" ],
+        preload: true
+      });
+
+      this.play();
+
     },
     next: function(){
       var currentTrackIndex = trackIndex(this.currentAlbum, this.currentSong);
@@ -211,8 +231,14 @@ blocJams.service('SongPlayer', function() {
         this.currentSong = null;
         this.currentAlbum = null;
 
+        currentSoundFile.pause();
+        currentSoundFile = null;
+
         return;
       }
+
+      var song = this.currentAlbum.songs[currentTrackIndex];
+      this.setSong(this.currentAlbum, song);
 
       this.currentSong = this.currentAlbum.songs[currentTrackIndex];
     },
@@ -224,8 +250,15 @@ blocJams.service('SongPlayer', function() {
         this.playing = false;
         this.currentSong = null;
         this.currentAlbum = null;
+
+        currentSoundFile.pause();
+        currentSoundFile = null;
+
         return;
       }
+
+      var song = this.currentAlbum.songs[currentTrackIndex];
+      this.setSong(this.currentAlbum, song);
 
       this.currentSong  = this.currentAlbum.songs[currentTrackIndex];
     }
@@ -246,4 +279,18 @@ blocJams.service('ConsoleLogger', function() {
 
 
 
+// var audio = 'http://lso.co.uk/images/LSO0092ex2b.mp3';
 
+//       var fadeInOut = function(audioClip){
+
+//         var song = new buzz.sound(audioClip).play().fadeIn(function(){
+//           setTimeout(fadeSongOut, 5000)
+//         });
+
+//         var fadeSongOut = function () {
+//           song.fadeOut();
+//         }
+
+//       };//
+
+//       fadeInOut(audio);
