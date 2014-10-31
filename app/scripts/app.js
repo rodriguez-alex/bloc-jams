@@ -347,3 +347,56 @@ blocJams.directive('slider', function(){
     
    };
  });
+
+
+
+blocJams.directive('clickMe', function(){
+
+	return {
+		restrict: 'E',
+		link: function(scope, element, attributes){
+			$(element).click(function(){
+
+				alert('clicked');
+
+			});
+		}
+	}
+
+});
+
+blocJams.directive('countHoverTime', function(){
+
+	return {
+		restrict: 'C',
+		link: function(scope, element, attributes){
+
+			var count = 0;
+
+			$(element).mouseover(function(){
+
+				setInterval(function(){count++;}, 1000);
+
+			});
+
+			$(element).mouseout(function(){
+				console.log(count + 'seconds');
+			});
+		}
+	}
+
+});
+
+
+blocJams.directive('classify', function(){
+	return {
+		restrict: 'AEC',
+		link: function(scope, element, attributes){
+			var $element = $(element);
+
+			var text = $(element).html();
+
+			$element.addClass(text);
+		}
+	}
+});

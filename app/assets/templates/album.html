@@ -12,6 +12,19 @@
    </div>
  
    <div class='row'> <!-- Song table -->
+
+    <div style="text-align: center;"><click-me> click me </click-me></div>
+
+    <div style="text-align: center;" class="count-hover-time"> mouseover count</div>
+
+
+
+    <div style="text-align: center;" class="classify"> classify-class</div>
+
+    <div style="text-align: center;"><classify> classify-element </classify></div>
+
+    <div style="text-align: center;" classify> classify-attribute</div>    
+
      <table class='album-song-listing table'>
 
         <tr ng-repeat="song in album.songs" ng-mouseenter="onHoverSong(song)" ng-mouseleave="offHoverSong(song)" ng-class-odd="'odd'">
