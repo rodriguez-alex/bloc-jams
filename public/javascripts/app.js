@@ -573,55 +573,74 @@ blocJams.service('ConsoleLogger', function() {
 
 
 
-blocJams.directive('slider', function(){
+blocJams.directive('slider', ['$document',  function($document){
 
-	var updateSeekPercentage = function($seekBar, event) {
-    var barWidth = $seekBar.width();
-    var offsetX = event.pageX - $seekBar.offset().left;
-
-    var offsetXPercent = (offsetX  / barWidth) * 100;
-    offsetXPercent = Math.max(0, offsetXPercent);
-    offsetXPercent = Math.min(100, offsetXPercent);
-
-    var percentageString = offsetXPercent + '%';
-    $seekBar.find('.fill').width(percentageString);
-    $seekBar.find('.thumb').css({left: percentageString});
-  }
-
-
-
+	// Returns a number between 0 and 1 to determine where the mouse event happened along the slider bar.
+   var calculateSliderPercentFromMouseEvent = function($slider, event) {
+     var offsetX =  event.pageX - $slider.offset().left; // Distance from left
+     var sliderWidth = $slider.width(); // Width of slider
+     var offsetXPercent = (offsetX  / sliderWidth);
+     offsetXPercent = Math.max(0, offsetXPercent);
+     offsetXPercent = Math.min(1, offsetXPercent);
+     return offsetXPercent;
+   }
 
    return {
      templateUrl: '/templates/directives/slider.html', // We'll create these files shortly.
      replace: true,
+     scope: {}, // Creates a scope that exists only in this directive.
      restrict: 'E',
      link: function(scope, element, attributes) {
-      
+
+			scope.value = 0;
+
+			scope.max = 200;
+
       var $seekBar = $(element);
+
+
+      var percentString = function () {
+         percent = Number(scope.value) / Number(scope.max)  * 100;
+         return percent + "%";
+       }
  
-      $seekBar.click(function(event) {
-        updateSeekPercentage($seekBar, event);
-      });
+       scope.fillStyle = function() {
+         return {width: percentString()};
+       }
  
-      $seekBar.find('.thumb').mousedown(function(event){
-        $seekBar.addClass('no-animate');
+       scope.thumbStyle = function() {
+         return {left: percentString()};
+       }
+
+       scope.onClickSlider = function(event) {
+		     var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
+	       scope.value = percent * scope.max;
+       }
+
+       scope.trackThumb = function() {
+         $document.bind('mousemove.thumb', function(event){
+           var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
+           scope.$apply(function(){
+             scope.value = percent * scope.max;
+           });
+         });
  
-        $(document).bind('mousemove.thumb', function(event){
-          updateSeekPercentage($seekBar, event);
-        });
- 
-        //cleanup
-        $(document).bind('mouseup.thumb', function(){
-          $seekBar.removeClass('no-animate');
-          $(document).unbind('mousemove.thumb');
-          $(document).unbind('mouseup.thumb');
-        });
- 
-      });
-    }// link
-    
-   };
- });
+         //cleanup
+         $document.bind('mouseup.thumb', function(){
+           $document.unbind('mousemove.thumb');
+           $document.unbind('mouseup.thumb');
+         });
+       };
+
+
+
+    }
+  }// link
+
+}]);
+
+
+
 });
 
 ;require.register("scripts/collection", function(exports, require, module) {
