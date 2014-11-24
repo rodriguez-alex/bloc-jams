@@ -171,6 +171,15 @@ blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLog
 	$scope.songPlayer = SongPlayer;
 	$scope.consoleLogger = ConsoleLogger;
 
+	
+	 $scope.volumeClass = function() {
+		 return {
+			'fa-volume-off': SongPlayer.volume == 0,
+			'fa-volume-down': SongPlayer.volume <= 70 && SongPlayer.volume > 0,
+			'fa-volume-up': SongPlayer.volume > 70
+		};
+	}
+
 	SongPlayer.onTimeUpdate(function(event, time){
 		$scope.$apply(function(){
 			$scope.playTime = time;
@@ -202,6 +211,8 @@ blocJams.service('SongPlayer', ['$rootScope', function($rootScope) {
 		currentSong: null,
 		currentAlbum: null,
 		playing: false,
+		volume: 90,
+		prevVolume: null,
 
 		play: function() {
 			this.playing = true;
@@ -221,6 +232,34 @@ blocJams.service('SongPlayer', ['$rootScope', function($rootScope) {
 		onTimeUpdate: function(callback){
 			return $rootScope.$on('sound:timeupdate', callback);
 		},
+		setVolume: function(volume) {
+			if(currentSoundFile){
+				currentSoundFile.setVolume(volume);
+			}
+			this.volume = volume;
+		},
+		muteToggle: function(){
+
+			//stored previous value
+			if(this.prevVolume === null){
+				this.prevVolume = this.volume;
+			}
+
+			//if the volume is 0, then we want to revert to the original volume
+			if(this.volume == 0){
+
+				console.log('setting it back to old value which is ' + this.prevVolume);
+				this.volume = this.prevVolume;
+			}
+			else {
+				this.volume = 0;
+			}
+
+			//if song is playing, let's set the volume to 0
+			if(currentSoundFile){
+				currentSoundFile.setVolume(this.volume);
+			}
+		},
 		setSong: function(album, song) {
 			if (currentSoundFile) {
 				currentSoundFile.stop();
@@ -233,6 +272,8 @@ blocJams.service('SongPlayer', ['$rootScope', function($rootScope) {
 				formats: [ "mp3" ],
 				preload: true
 			});
+
+			currentSoundFile.setVolume(this.volume);
 
 			currentSoundFile.bind('timeupdate', function(e){
 				$rootScope.$broadcast('sound:timeupdate', this.getTime());
@@ -388,7 +429,7 @@ blocJams.directive('slider', ['$document',  function($document){
 				 notifyCallback(scope.value);
 			 }
 
-			 scope.trackThumb = function() {
+			 scope.a12 = function() {
 				 $document.bind('mousemove.thumb', function(event){
 					 var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
 					 scope.$apply(function(){
@@ -417,32 +458,32 @@ blocJams.directive('slider', ['$document',  function($document){
 
 
  blocJams.filter('timecode', function(){
-   return function(seconds) {
-     seconds = Number.parseFloat(seconds);
+	 return function(seconds) {
+		 seconds = Number.parseFloat(seconds);
  
-     // Returned when no time is provided.
-     if (Number.isNaN(seconds)) {
-       return '-:--';
-     }
+		 // Returned when no time is provided.
+		 if (Number.isNaN(seconds)) {
+			 return '-:--';
+		 }
  
-     // make it a whole number
-     var wholeSeconds = Math.floor(seconds);
+		 // make it a whole number
+		 var wholeSeconds = Math.floor(seconds);
  
-     var minutes = Math.floor(wholeSeconds / 60);
+		 var minutes = Math.floor(wholeSeconds / 60);
  
-     remainingSeconds = wholeSeconds % 60;
+		 remainingSeconds = wholeSeconds % 60;
  
-     var output = minutes + ':';
+		 var output = minutes + ':';
  
-     // zero pad seconds, so 9 seconds should be :09
-     if (remainingSeconds < 10) {
-       output += '0';
-     }
+		 // zero pad seconds, so 9 seconds should be :09
+		 if (remainingSeconds < 10) {
+			 output += '0';
+		 }
  
-     output += remainingSeconds;
+		 output += remainingSeconds;
  
-     return output;
-   }
+		 return output;
+	 }
  })
 
 
