@@ -46,13 +46,63 @@ blocJams.config(['$stateProvider', '$locationProvider', function($stateProvider,
 	 });
 
 	 $stateProvider.state('album', {
-		 url: '/album',
-		 templateUrl: '/templates/album.html',
-		 controller: 'Album.controller'
+		url: '/album',
+		templateUrl: '/templates/album.html',
+		controller: 'Album.controller'
+	 });
+
+	 $stateProvider.state('charts', {
+	 	url: '/charts',
+	 	templateUrl: '/templates/charts.html',
+	 	controller: 'Charts.controller'
 	 });
 
 
  }]);
+
+
+
+
+
+blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', function($scope, ConsoleLogger, Metric){
+
+	ConsoleLogger.log();
+
+	$scope.metric = Metric;
+
+}]);
+
+
+
+
+
+blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLogger', function($scope, SongPlayer, ConsoleLogger) {
+	$scope.songPlayer = SongPlayer;
+	$scope.consoleLogger = ConsoleLogger;
+
+	
+	 $scope.volumeClass = function() {
+		 return {
+			'fa-volume-off': SongPlayer.volume == 0,
+			'fa-volume-down': SongPlayer.volume <= 70 && SongPlayer.volume > 0,
+			'fa-volume-up': SongPlayer.volume > 70
+		};
+	}
+
+	SongPlayer.onTimeUpdate(function(event, time){
+		$scope.$apply(function(){
+			$scope.playTime = time;
+		});
+	});
+
+	ConsoleLogger.log();
+}]);
+
+
+
+
+
+
 
 
 blocJams.controller('Collection.controller', ['$scope', 'ConsoleLogger', 'SongPlayer', function($scope, ConsoleLogger, SongPlayer){
@@ -70,7 +120,7 @@ blocJams.controller('Collection.controller', ['$scope', 'ConsoleLogger', 'SongPl
 		 SongPlayer.setSong(album, album.songs[0]); // Targets first song in the array.
 	 }
 
-}])
+}]);
 
 
 
@@ -164,37 +214,16 @@ blocJams.controller('Album.controller', ['$scope', 'SongPlayer', 'ConsoleLogger'
 
 
 
-/////////////////////////////////
-//SONG PLAYER RELATED CONTROLLER
-
-blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLogger', function($scope, SongPlayer, ConsoleLogger) {
-	$scope.songPlayer = SongPlayer;
-	$scope.consoleLogger = ConsoleLogger;
-
-	
-	 $scope.volumeClass = function() {
-		 return {
-			'fa-volume-off': SongPlayer.volume == 0,
-			'fa-volume-down': SongPlayer.volume <= 70 && SongPlayer.volume > 0,
-			'fa-volume-up': SongPlayer.volume > 70
-		};
-	}
-
-	SongPlayer.onTimeUpdate(function(event, time){
-		$scope.$apply(function(){
-			$scope.playTime = time;
-		});
-	});
-
-	ConsoleLogger.log();
-}]);
 
 
 
+/*-------------------------
 
 
+SERVICES
 
 
+--------------------------*/
 
 
 blocJams.service('SongPlayer', ['$rootScope', function($rootScope) {
@@ -340,6 +369,41 @@ blocJams.service('ConsoleLogger', function() {
 
 
 
+// Create a Metric Service.
+blocJams.service('Metric', ['$rootScope', function($rootScope) {
+  $rootScope.songPlays = [];
+  $rootScope.btnClick_play = [];
+  $rootScope.btnClick_pause = [];
+  $rootScope.btnClick_nxt = [];
+  $rootScope.btnClick_prev = [];
+
+  return {
+    // Function that records a metric object by pushing it to our $rootScope array.
+    registerSongPlay: function(songObj) {
+      // Add time to event register.
+      songObj['playedAt'] = new Date();
+      $rootScope.songPlays.push(songObj);
+    },
+    listSongsPlayed: function() {
+      var songs = [];
+      angular.forEach($rootScope.songPlays, function(song) {
+        // Check to make sure the song isn't added twice.
+        if (songs.indexOf(song.name) != -1) {
+          songs.push(song.name);
+        }
+      });
+      return songs;
+    },
+    logData_click: function(){
+    	console.log('clicked');
+    }
+
+  };
+
+}]);
+
+
+
 // var audio = 'http://lso.co.uk/images/LSO0092ex2b.mp3';
 
 //       var fadeInOut = function(audioClip){
@@ -358,7 +422,13 @@ blocJams.service('ConsoleLogger', function() {
 
 
 
+/*-------------------------
 
+
+DIRECTIVES
+
+
+--------------------------*/
 blocJams.directive('slider', ['$document',  function($document){
 
 	// Returns a number between 0 and 1 to determine where the mouse event happened along the slider bar.
@@ -457,6 +527,25 @@ blocJams.directive('slider', ['$document',  function($document){
 }]);
 
 
+
+blocJams.directive('radarChart', ['$document', '$rootScope',  function($document, $rootScope){
+
+return {
+	templateUrl: '/templates/directives/slider.html'
+}
+
+}]);
+
+
+
+
+/*-------------------------
+
+
+FILTERS
+
+
+--------------------------*/
  blocJams.filter('timecode', function(){
 	 return function(seconds) {
 		 seconds = Number.parseFloat(seconds);
