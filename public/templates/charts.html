@@ -1,6 +1,12 @@
 <div ng-controller="Charts.controller" class='container charts-container'>
    
-   <h1 ng-click="metric.logData_click()">test</h1>
+   <h1>Pause: {{clickedBtns.pause}}</h1>
+
+   <h2>Play: {{clickedBtns.play}}</h2>
+
+   <h3>Next: {{clickedBtns.nxt}}</h3>
+
+   <h4>Prev: {{clickedBtns.prev}}</h4>
 
    <ng-include src="'/templates/player_bar.html'"></ng-include>
  </div>

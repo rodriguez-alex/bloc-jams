@@ -327,9 +327,9 @@ blocJams.config(['$stateProvider', '$locationProvider', function($stateProvider,
 	 });
 
 	 $stateProvider.state('charts', {
-	 	url: '/charts',
-	 	templateUrl: '/templates/charts.html',
-	 	controller: 'Charts.controller'
+		url: '/charts',
+		templateUrl: '/templates/charts.html',
+		controller: 'Charts.controller'
 	 });
 
 
@@ -339,11 +339,50 @@ blocJams.config(['$stateProvider', '$locationProvider', function($stateProvider,
 
 
 
-blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', function($scope, ConsoleLogger, Metric){
+blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', '$rootScope', function($scope, ConsoleLogger, Metric, $rootScope){
 
 	ConsoleLogger.log();
 
 	$scope.metric = Metric;
+	$scope.clickedBtns = {
+		play: $rootScope.clickedBtns.play,
+		pause: $rootScope.clickedBtns.pause,
+		prev: $rootScope.clickedBtns.prev,
+		nxt: $rootScope.clickedBtns.nxt
+	}
+
+	Metric.onClickUpdate(function(event, clickedBtns){
+		$scope.$apply(function(){
+			$scope.clickedBtns = clickedBtns;
+		});
+	});
+
+
+	$scope.dataGraph = {
+		labels: ["Eating", "Drinking", "Sleeping", "Designing", "Coding", "Cycling", "Running"],
+		datasets: [
+			{
+				label: "My First dataset",
+				fillColor: "rgba(220,220,220,0.2)",
+				strokeColor: "rgba(220,220,220,1)",
+				pointColor: "rgba(220,220,220,1)",
+				pointStrokeColor: "#fff",
+				pointHighlightFill: "#fff",
+				pointHighlightStroke: "rgba(220,220,220,1)",
+				data: [65, 59, 90, 81, 56, 55, 40]
+			},
+			{
+				label: "My Second dataset",
+				fillColor: "rgba(151,187,205,0.2)",
+				strokeColor: "rgba(151,187,205,1)",
+				pointColor: "rgba(151,187,205,1)",
+				pointStrokeColor: "#fff",
+				pointHighlightFill: "#fff",
+				pointHighlightStroke: "rgba(151,187,205,1)",
+				data: [28, 48, 40, 19, 96, 27, 100]
+			}
+		]
+	};
 
 }]);
 
@@ -351,10 +390,10 @@ blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', f
 
 
 
-blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLogger', function($scope, SongPlayer, ConsoleLogger) {
+blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLogger', 'Metric', function($scope, SongPlayer, ConsoleLogger, Metric) {
 	$scope.songPlayer = SongPlayer;
 	$scope.consoleLogger = ConsoleLogger;
-
+	$scope.metric = Metric;
 	
 	 $scope.volumeClass = function() {
 		 return {
@@ -646,34 +685,97 @@ blocJams.service('ConsoleLogger', function() {
 
 // Create a Metric Service.
 blocJams.service('Metric', ['$rootScope', function($rootScope) {
-  $rootScope.songPlays = [];
-  $rootScope.btnClick_play = [];
-  $rootScope.btnClick_pause = [];
-  $rootScope.btnClick_nxt = [];
-  $rootScope.btnClick_prev = [];
 
-  return {
-    // Function that records a metric object by pushing it to our $rootScope array.
-    registerSongPlay: function(songObj) {
-      // Add time to event register.
-      songObj['playedAt'] = new Date();
-      $rootScope.songPlays.push(songObj);
-    },
-    listSongsPlayed: function() {
-      var songs = [];
-      angular.forEach($rootScope.songPlays, function(song) {
-        // Check to make sure the song isn't added twice.
-        if (songs.indexOf(song.name) != -1) {
-          songs.push(song.name);
-        }
-      });
-      return songs;
-    },
-    logData_click: function(){
-    	console.log('clicked');
-    }
+	$rootScope.songPlays = [];
+	$rootScope.clickedBtns = {
+		pause: 0,
+		play: 0,
+		nxt: 0,
+		prev: 0,
+		mute: 0,
+		volumeAdjust: 0
+	};
 
-  };
+	return {
+		btn_pause: 0,
+		btn_play: 0,
+		btn_prev: 0,
+		btn_nxt: 0,
+
+		// Function that records a metric object by pushing it to our $rootScope array.
+		registerSongPlay: function(songObj) {
+			// Add time to event register.
+			songObj['playedAt'] = new Date();
+			$rootScope.songPlays.push(songObj);
+		},
+		listSongsPlayed: function() {
+			var songs = [];
+			angular.forEach($rootScope.songPlays, function(song) {
+				// Check to make sure the song isn't added twice.
+				if (songs.indexOf(song.name) != -1) {
+					songs.push(song.name);
+				}
+			});
+			return songs;
+		},
+		logData_click: function(elementClicked){
+
+
+
+			switch(elementClicked){
+				case 'pause':
+					console.log('clicked' + elementClicked);
+					$rootScope.clickedBtns.pause = this.btn_pause+1;
+
+					this.btn_pause = this.btn_pause+1;
+
+					console.log($rootScope.clickedBtns.pause);
+
+					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
+					break;
+
+				case 'play':
+					console.log('clicked' + elementClicked);
+					$rootScope.clickedBtns.play = this.btn_play+1;
+
+					this.btn_play = this.btn_play+1;
+
+					console.log($rootScope.clickedBtns.play);
+
+					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
+					break;
+
+				case 'nxt':
+					console.log('clicked' + elementClicked);
+					$rootScope.clickedBtns.nxt = this.btn_nxt+1;
+
+					this.btn_nxt = this.btn_nxt+1;
+
+					console.log($rootScope.clickedBtns.nxt);
+
+					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
+					break;
+
+				case 'prev': 
+					console.log('clicked' + elementClicked);
+					$rootScope.clickedBtns.prev = this.btn_prev+1;
+
+					this.btn_prev = this.btn_prev+1;
+
+					console.log($rootScope.clickedBtns.prev);
+
+					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
+					break;
+			}
+
+
+		},
+
+		onClickUpdate: function(callback){
+			return $rootScope.$on('btn:click', callback);
+		},
+
+	};
 
 }]);
 
