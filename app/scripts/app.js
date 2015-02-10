@@ -116,6 +116,7 @@ blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', '
 
 	};
 
+	$scope.makeGraph();
 	
 
 }]);
