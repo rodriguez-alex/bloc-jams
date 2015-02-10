@@ -1,15 +1,15 @@
 <div ng-controller="PlayerBar.controller" class='player-bar'>
    <div class='container'>
      <div class='play-controls player-bar-control-group left-controls'>
-       <a class='previous' ng-click="songPlayer.previous()" ng-Hide="!songPlayer.currentSong">
+       <a class='previous' ng-click="songPlayer.previous(); metric.logData_click('prev')" ng-Hide="!songPlayer.currentSong">
          <i class='fa fa-backward'></i>
          <input ng-model="consoleLogger.string" ng-model-options="{ getterSetter: true }" style="color: red;" ng-bind="consoleLogger.log()">
        </a>
        <a class='play-pause'>
-         <i class='fa fa-play' ng-show="!songPlayer.playing" ng-click="songPlayer.play()"></i>
-         <i class='fa fa-pause' ng-show="songPlayer.playing" ng-click="songPlayer.pause()"></i>
+         <i class='fa fa-play' ng-show="!songPlayer.playing" ng-click="songPlayer.play();  metric.logData_click('play')"></i>
+         <i class='fa fa-pause' ng-show="songPlayer.playing" ng-click="songPlayer.pause(); metric.logData_click('pause')"></i>
        </a>
-       <a class='next' ng-click="songPlayer.next()" ng-Hide="!songPlayer.currentSong">
+       <a class='next' ng-click="songPlayer.next(); metric.logData_click('nxt')" ng-Hide="!songPlayer.currentSong">
          <i class='fa fa-forward'></i>
        </a>
      </div>
@@ -24,8 +24,8 @@
      </div>
      <div class='right-controls player-bar-control-group'>
        <div class='volume' >
-         <i class='fa' ng-class="volumeClass()" ng-click="songPlayer.muteToggle()"></i>
-         <slider value='{{songPlayer.volume}}' max='100' on-change='songPlayer.setVolume(value)'></slider>
+         <i class='fa' ng-class="volumeClass()" ng-click="songPlayer.muteToggle(); metric.logData_click('mute')"></i>
+         <slider value='{{songPlayer.volume}}' max="100" on-change="songPlayer.setVolume(value);  metric.logData_click('volumeAdjust')"></slider>
        </div>
        <div class='queue-toggle'>
          <a>
