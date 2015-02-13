@@ -341,42 +341,49 @@ blocJams.config(['$stateProvider', '$locationProvider', function($stateProvider,
 
 blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', '$rootScope', function($scope, ConsoleLogger, Metric, $rootScope){
 
-	ConsoleLogger.log();
 
 	$scope.metric = Metric;
 
-	Metric.onClickUpdate(function(event, clickedBtns){
-		if(document.getElementById('myChart')) {
-			$scope.makeGraph();
-		}
-	});
-
 	$scope.makeGraph = function(){
 
-		var dataGraph = {
-			labels: ["Play", "pause", "pause", "prev"],
-			datasets: [
-				{
-					label: "My First dataset",
-					fillColor: "rgba(220,220,220,0.2)",
-					strokeColor: "rgba(220,220,220,1)",
-					pointColor: "rgba(220,220,220,1)",
-					pointStrokeColor: "#fff",
-					pointHighlightFill: "#fff",
-					pointHighlightStroke: "rgba(220,220,220,1)",
-					data: [$scope.clickedBtns.play, $scope.clickedBtns.pause, $scope.clickedBtns.prev, $scope.clickedBtns.nxt]
-				}
-			]
-		};
+		if(document.getElementById('myChart')){
+			var dataGraph = {
+				labels: ["Play", "pause", "pause", "prev"],
+				datasets: [
+					{
+						label: "My First dataset",
+						fillColor: "rgba(220,220,220,0.2)",
+						strokeColor: "rgba(220,220,220,1)",
+						pointColor: "rgba(220,220,220,1)",
+						pointStrokeColor: "#fff",
+						pointHighlightFill: "#fff",
+						pointHighlightStroke: "rgba(220,220,220,1)",
+						data: [Metric.clickedBtns.play, Metric.clickedBtns.pause, Metric.clickedBtns.prev, Metric.clickedBtns.nxt]
+					}
+				]
+			};
 
-		var ctx = document.getElementById("myChart").getContext("2d");
-		var myNewChart = new Chart(ctx).Radar(dataGraph, {
-			responsive: true
-		});
+			var ctx = document.getElementById("myChart").getContext("2d");
+			var myNewChart = new Chart(ctx).Radar(dataGraph, {
+				responsive: true
+			});
+		}
 
-	};
+	};//makegraph
 
+
+
+
+
+	ConsoleLogger.log();
+
+	Metric.onClickUpdate(function(event){
+		$scope.makeGraph();
+	});
+
+	//first time run
 	$scope.makeGraph();
+
 	
 }]);
 
@@ -388,35 +395,40 @@ blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLog
 	$scope.songPlayer = SongPlayer;
 	$scope.consoleLogger = ConsoleLogger;
 
+	$scope.logData_click = function(elementClicked){
+		Metric.setLoggedClick(elementClicked);
+	};
+
 	$scope.play = function(){
 		SongPlayer.play(); 
-		Metric.logData_click('play');
+		$scope.logData_click('play');
 	};
 
 	$scope.pause = function(){
 		SongPlayer.pause();
-		Metric.logData_click('pause');
+		$scope.logData_click('pause');
 	};
 
 	$scope.next = function(){
 		SongPlayer.next();
-		Metric.logData_click('next');
+		$scope.logData_click('next');
 	};
 
 	$scope.prev = function(){
 		SongPlayer.previous();
-		Metric.logData_click('prev');
+		$scope.logData_click('prev');
 	};
 	
-	 $scope.volumeClass = function() {
+	$scope.volumeClass = function() {
 		 return {
 			'fa-volume-off': SongPlayer.volume == 0,
 			'fa-volume-down': SongPlayer.volume <= 70 && SongPlayer.volume > 0,
 			'fa-volume-up': SongPlayer.volume > 70
 		};
-	}
+	};
 
 	SongPlayer.onTimeUpdate(function(event, time){
+
 		$scope.$apply(function(){
 			$scope.playTime = time;
 		});
@@ -700,20 +712,14 @@ blocJams.service('ConsoleLogger', function() {
 blocJams.service('Metric', ['$rootScope', function($rootScope) {
 
 	$rootScope.songPlays = [];
-	$rootScope.clickedBtns = {
-		pause: 0,
-		play: 0,
-		nxt: 0,
-		prev: 0,
-		mute: 0,
-		volumeAdjust: 0
-	};
 
 	return {
-		btn_pause: 0,
-		btn_play: 0,
-		btn_prev: 0,
-		btn_nxt: 0,
+		clickedBtns : {
+			pause: 0,
+			play: 0,
+			prev: 0,
+			nxt: 0
+		},
 
 		// Function that records a metric object by pushing it to our $rootScope array.
 		registerSongPlay: function(songObj) {
@@ -731,51 +737,36 @@ blocJams.service('Metric', ['$rootScope', function($rootScope) {
 			});
 			return songs;
 		},
-		logData_click: function(elementClicked){
-
-			switch(elementClicked){
-				case 'pause':
-					$rootScope.clickedBtns.pause = this.btn_pause+1;
-
-					this.btn_pause = this.btn_pause+1;
-
-					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
-					break;
-
-				case 'play':
-					$rootScope.clickedBtns.play = this.btn_play+1;
-
-					this.btn_play = this.btn_play+1;
-
-					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
-					break;
-
-				case 'nxt':
-					$rootScope.clickedBtns.nxt = this.btn_nxt+1;
-
-					this.btn_nxt = this.btn_nxt+1;
-
-					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
-					break;
-
-				case 'prev': 
-					$rootScope.clickedBtns.prev = this.btn_prev+1;
-
-					this.btn_prev = this.btn_prev+1;
-
-					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
-					break;
-			}
-
-
-		},
 
 		onClickUpdate: function(callback){
 			return $rootScope.$on('btn:click', callback);
 		},
 
-	};
+		setLoggedClick: function(elementClicked){
 
+			switch(elementClicked) {
+				case 'pause':
+					this.clickedBtns.pause = this.clickedBtns.pause+1;
+					$rootScope.$broadcast('btn:click', this.clickedBtns);
+					break;
+
+				case 'play':
+					this.clickedBtns.play = this.clickedBtns.play+1;
+					$rootScope.$broadcast('btn:click', this.clickedBtns);
+					break;
+
+				case 'next':
+					this.clickedBtns.nxt = this.clickedBtns.nxt+1;
+					$rootScope.$broadcast('btn:click', this.clickedBtns);
+					break;
+
+				case 'prev': 
+					this.clickedBtns.prev = this.clickedBtns.prev+1;
+					$rootScope.$broadcast('btn:click', this.clickedBtns);
+					break;
+			}
+		}
+	}
 }]);
 
 
