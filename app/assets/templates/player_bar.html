@@ -1,15 +1,15 @@
 <div ng-controller="PlayerBar.controller" class='player-bar'>
    <div class='container'>
      <div class='play-controls player-bar-control-group left-controls'>
-       <a class='previous' ng-click="songPlayer.previous(); metric.logData_click('prev')" ng-Hide="!songPlayer.currentSong">
+       <a class='previous' ng-click="prev()" ng-Hide="!songPlayer.currentSong">
          <i class='fa fa-backward'></i>
          <input ng-model="consoleLogger.string" ng-model-options="{ getterSetter: true }" style="color: red;" ng-bind="consoleLogger.log()">
        </a>
        <a class='play-pause'>
-         <i class='fa fa-play' ng-show="!songPlayer.playing" ng-click="songPlayer.play();  metric.logData_click('play')"></i>
-         <i class='fa fa-pause' ng-show="songPlayer.playing" ng-click="songPlayer.pause(); metric.logData_click('pause')"></i>
+         <i class='fa fa-play' ng-show="!songPlayer.playing" ng-click="play()"></i>
+         <i class='fa fa-pause' ng-show="songPlayer.playing" ng-click="pause()"></i>
        </a>
-       <a class='next' ng-click="songPlayer.next(); metric.logData_click('nxt')" ng-Hide="!songPlayer.currentSong">
+       <a class='next' ng-click="next()" ng-Hide="!songPlayer.currentSong">
          <i class='fa fa-forward'></i>
        </a>
      </div>

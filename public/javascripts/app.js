@@ -344,29 +344,14 @@ blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', '
 	ConsoleLogger.log();
 
 	$scope.metric = Metric;
-	$scope.clickedBtns = {
-		play: $rootScope.clickedBtns.play,
-		pause: $rootScope.clickedBtns.pause,
-		prev: $rootScope.clickedBtns.prev,
-		nxt: $rootScope.clickedBtns.nxt
-	}
 
 	Metric.onClickUpdate(function(event, clickedBtns){
-		$scope.$apply(function(){
-			$scope.clickedBtns = clickedBtns;
-		});
-
-		console.log('clicked');
-
 		if(document.getElementById('myChart')) {
-			console.log('exists ');
 			$scope.makeGraph();
 		}
 	});
 
 	$scope.makeGraph = function(){
-
-		console.log('making graph');
 
 		var dataGraph = {
 			labels: ["Play", "pause", "pause", "prev"],
@@ -393,7 +378,6 @@ blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', '
 
 	$scope.makeGraph();
 	
-
 }]);
 
 
@@ -403,7 +387,26 @@ blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', '
 blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', 'ConsoleLogger', 'Metric', function($scope, SongPlayer, ConsoleLogger, Metric) {
 	$scope.songPlayer = SongPlayer;
 	$scope.consoleLogger = ConsoleLogger;
-	$scope.metric = Metric;
+
+	$scope.play = function(){
+		SongPlayer.play(); 
+		Metric.logData_click('play');
+	};
+
+	$scope.pause = function(){
+		SongPlayer.pause();
+		Metric.logData_click('pause');
+	};
+
+	$scope.next = function(){
+		SongPlayer.next();
+		Metric.logData_click('next');
+	};
+
+	$scope.prev = function(){
+		SongPlayer.previous();
+		Metric.logData_click('prev');
+	};
 	
 	 $scope.volumeClass = function() {
 		 return {
@@ -730,49 +733,35 @@ blocJams.service('Metric', ['$rootScope', function($rootScope) {
 		},
 		logData_click: function(elementClicked){
 
-
-
 			switch(elementClicked){
 				case 'pause':
-					console.log('clicked' + elementClicked);
 					$rootScope.clickedBtns.pause = this.btn_pause+1;
 
 					this.btn_pause = this.btn_pause+1;
-
-					console.log($rootScope.clickedBtns.pause);
 
 					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
 					break;
 
 				case 'play':
-					console.log('clicked' + elementClicked);
 					$rootScope.clickedBtns.play = this.btn_play+1;
 
 					this.btn_play = this.btn_play+1;
-
-					console.log($rootScope.clickedBtns.play);
 
 					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
 					break;
 
 				case 'nxt':
-					console.log('clicked' + elementClicked);
 					$rootScope.clickedBtns.nxt = this.btn_nxt+1;
 
 					this.btn_nxt = this.btn_nxt+1;
-
-					console.log($rootScope.clickedBtns.nxt);
 
 					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
 					break;
 
 				case 'prev': 
-					console.log('clicked' + elementClicked);
 					$rootScope.clickedBtns.prev = this.btn_prev+1;
 
 					this.btn_prev = this.btn_prev+1;
-
-					console.log($rootScope.clickedBtns.prev);
 
 					$rootScope.$broadcast('btn:click', $rootScope.clickedBtns);
 					break;
@@ -913,15 +902,6 @@ blocJams.directive('slider', ['$document',  function($document){
 
 }]);
 
-
-
-blocJams.directive('radarChart', ['$document', '$rootScope',  function($document, $rootScope){
-
-return {
-	templateUrl: '/templates/directives/slider.html'
-}
-
-}]);
 
 
 
