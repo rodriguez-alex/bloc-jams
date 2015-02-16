@@ -72,8 +72,11 @@ blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', '
 	$scope.makeGraph = function(){
 
 		if(document.getElementById('myChart')){
+
+			console.log('chart');
+
 			var dataGraph = {
-				labels: ["Play", "pause", "pause", "prev"],
+				labels: ["Play", "pause", "prev", "next"],
 				datasets: [
 					{
 						label: "My First dataset",
@@ -88,10 +91,14 @@ blocJams.controller('Charts.controller', ['$scope', 'ConsoleLogger', 'Metric', '
 				]
 			};
 
+			if (window.myNewChart) {
+     		window.myNewChart.destroy();
+			}
+
 			var ctx = document.getElementById("myChart").getContext("2d");
-			var myNewChart = new Chart(ctx).Radar(dataGraph, {
-				responsive: true
-			});
+			ctx.canvas.style.width = 500;
+			ctx.canvas.style.height = 500;
+			window.myNewChart = new Chart(ctx).Radar(dataGraph);
 		}
 
 	};//makegraph

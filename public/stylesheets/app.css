@@ -340,9 +340,5 @@ body.landing .navbar {
     .player-header-nav .navbar-nav a:hover {
       color: rgba(123, 70, 163, 0.9); }
 
-#myChart {
-  width: 500px !important;
-  height: 500px !important; }
-
 
 /*# sourceMappingURL=app.css.map*/
